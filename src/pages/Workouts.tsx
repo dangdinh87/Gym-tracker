@@ -2,9 +2,11 @@ import { useWorkouts } from "@/hooks/useWorkouts";
 import { PageHeader, PageHeaderHeading, PageHeaderDescription } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Calendar, Clock, CheckCircle, Circle } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Plus, Calendar, Clock, Eye } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Navbar } from "@/components/layout/navbar";
+import { format } from "date-fns";
 
 const Workouts = () => {
   const { workouts, deleteWorkout } = useWorkouts();
@@ -37,61 +39,54 @@ const Workouts = () => {
 
         {sortedWorkouts.length > 0 ? (
           <div className="grid gap-4">
-            {sortedWorkouts.map((workout) => (
-              <Card key={workout.id} className="bg-gradient-card border-border shadow-card hover:shadow-glow transition-all duration-300">
-                <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <div className="flex items-center space-x-3">
-                      {workout.completed ? (
-                        <CheckCircle className="h-6 w-6 text-success" />
-                      ) : (
-                        <Circle className="h-6 w-6 text-muted-foreground" />
-                      )}
-                      <div>
-                        <CardTitle className="text-foreground text-xl">{workout.name}</CardTitle>
-                        <div className="flex items-center space-x-4 mt-2 text-sm text-muted-foreground">
-                          <div className="flex items-center">
-                            <Calendar className="h-4 w-4 mr-1" />
-                            {new Date(workout.date).toLocaleDateString()}
-                          </div>
+            {sortedWorkouts.map((workout) => {
+              const totalSets = workout.exercises.reduce((total, exercise) => total + exercise.sets.length, 0);
+              const totalVolume = workout.exercises.reduce((total, exercise) => {
+                return total + exercise.sets.reduce((exerciseTotal, set) => {
+                  return exerciseTotal + (set.weight * set.reps);
+                }, 0);
+              }, 0);
+
+              return (
+                <Card key={workout.id} className="bg-gradient-card border-border shadow-card hover:shadow-glow transition-all duration-300">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <h3 className="text-xl font-semibold mb-2">{workout.name}</h3>
+                        
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
+                          <span className="flex items-center gap-1">
+                            <Calendar className="w-4 h-4" />
+                            {format(new Date(workout.date), 'MMM dd, yyyy')}
+                          </span>
                           {workout.duration && (
-                            <div className="flex items-center">
-                              <Clock className="h-4 w-4 mr-1" />
-                              {Math.round(workout.duration / 60)} min
-                            </div>
+                            <span className="flex items-center gap-1">
+                              <Clock className="w-4 h-4" />
+                              {workout.duration} min
+                            </span>
                           )}
-                          <span>{workout.exercises.length} exercises</span>
+                        </div>
+
+                        <div className="flex gap-2">
+                          <Badge variant="outline">{workout.exercises.length} exercises</Badge>
+                          <Badge variant="outline">{totalSets} sets</Badge>
+                          <Badge variant="outline">{totalVolume}kg volume</Badge>
                         </div>
                       </div>
-                    </div>
-                    <div className="flex space-x-2">
-                      <Link to={`/workouts/${workout.id}`}>
-                        <Button variant="outline" size="sm">
-                          View
+
+                      <div className="flex gap-2">
+                        <Button asChild size="sm" variant="outline">
+                          <Link to={`/workouts/${workout.id}`}>
+                            <Eye className="w-4 h-4 mr-2" />
+                            View
+                          </Link>
                         </Button>
-                      </Link>
-                      <Link to={`/workouts/${workout.id}/edit`}>
-                        <Button variant="outline" size="sm">
-                          Edit
-                        </Button>
-                      </Link>
-                      <Button 
-                        variant="destructive" 
-                        size="sm"
-                        onClick={() => deleteWorkout(workout.id)}
-                      >
-                        Delete
-                      </Button>
+                      </div>
                     </div>
-                  </div>
-                </CardHeader>
-                {workout.notes && (
-                  <CardContent className="pt-0">
-                    <p className="text-muted-foreground text-sm">{workout.notes}</p>
                   </CardContent>
-                )}
-              </Card>
-            ))}
+                </Card>
+              );
+            })}
           </div>
         ) : (
           <Card className="bg-gradient-card border-border shadow-card">
