@@ -9,6 +9,7 @@ import NewWorkout from "./pages/NewWorkout";
 import WorkoutDetail from "./pages/WorkoutDetail";
 import Calendar from "./pages/Calendar";
 import Progress from "./pages/Progress";
+import Nutrition from "./pages/Nutrition";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/workouts/new" element={<NewWorkout />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/progress" element={<Progress />} />
+          <Route path="/nutrition" element={<Nutrition />} />
           <Route path="/settings" element={<Settings />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

@@ -1,4 +1,4 @@
-import { Dumbbell, Home, Calendar, TrendingUp, Settings } from "lucide-react";
+import { Dumbbell, Home, Calendar, TrendingUp, Settings, Apple } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -7,6 +7,7 @@ const navItems = [
   { to: "/workouts", icon: Dumbbell, label: "Workouts" },
   { to: "/calendar", icon: Calendar, label: "Calendar" },
   { to: "/progress", icon: TrendingUp, label: "Progress" },
+  { to: "/nutrition", icon: Apple, label: "Nutrition" },
   { to: "/settings", icon: Settings, label: "Settings" },
 ];
 
