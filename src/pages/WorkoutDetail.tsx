@@ -6,18 +6,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Calendar, Clock, Plus, Save, Edit2, Trash2 } from "lucide-react";
+import { ArrowLeft, Calendar, Clock, Plus, Save, Edit2, Trash2, Copy } from "lucide-react";
 import { useWorkouts } from "@/hooks/useWorkouts";
 import { Exercise, Set } from "@/types/workout";
 import { ExerciseCard } from "@/components/workout/ExerciseCard";
+import { ExerciseSearch } from "@/components/workout/ExerciseSearch";
+import { RestTimer } from "@/components/workout/RestTimer";
 import { useState } from "react";
 import { format } from "date-fns";
 import { toast } from "@/components/ui/use-toast";
+import { ExerciseLibraryItem } from "@/data/exerciseLibrary";
 
 const WorkoutDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { getWorkout, updateWorkout, deleteWorkout } = useWorkouts();
+  const { getWorkout, updateWorkout, deleteWorkout, addWorkout } = useWorkouts();
   
   const workout = getWorkout(id!);
   const [editMode, setEditMode] = useState(false);
@@ -76,6 +79,37 @@ const WorkoutDetail = () => {
     
     updateWorkout(workout.id, {
       exercises: [...workout.exercises, newExercise]
+    });
+  };
+
+  const addExerciseFromLibrary = (libraryExercise: ExerciseLibraryItem) => {
+    const newExercise: Exercise = {
+      id: Date.now().toString(),
+      name: libraryExercise.name,
+      muscleGroups: libraryExercise.muscleGroups,
+      sets: [],
+      notes: libraryExercise.instructions || "",
+    };
+    
+    updateWorkout(workout.id, {
+      exercises: [...workout.exercises, newExercise]
+    });
+  };
+
+  const duplicateWorkout = () => {
+    const duplicatedWorkout = {
+      ...workout,
+      id: Date.now().toString(),
+      name: `${workout.name} (Copy)`,
+      date: new Date().toISOString().split('T')[0],
+      completed: false,
+    };
+    
+    addWorkout(duplicatedWorkout);
+    navigate(`/workouts/${duplicatedWorkout.id}`);
+    toast({
+      title: "Workout duplicated",
+      description: "A copy of this workout has been created.",
     });
   };
 
@@ -150,6 +184,10 @@ const WorkoutDetail = () => {
                   </div>
                 </PageHeaderDescription>
                 <div className="flex gap-2">
+                  <Button variant="outline" onClick={duplicateWorkout}>
+                    <Copy className="w-4 h-4 mr-2" />
+                    Duplicate
+                  </Button>
                   <Button onClick={() => setEditMode(true)}>
                     <Edit2 className="w-4 h-4 mr-2" />
                     Edit
@@ -232,12 +270,28 @@ const WorkoutDetail = () => {
 
           <Card className="bg-gradient-card border-border shadow-card border-dashed">
             <CardContent className="p-8 text-center">
-              <Button onClick={addExercise} variant="ghost" className="flex items-center gap-2">
-                <Plus className="w-5 h-5" />
-                Add Exercise
-              </Button>
+              <div className="flex flex-col gap-3">
+                <div className="flex gap-2 justify-center">
+                  <ExerciseSearch 
+                    onSelect={addExerciseFromLibrary}
+                    trigger={
+                      <Button variant="ghost" className="flex items-center gap-2">
+                        <Plus className="w-5 h-5" />
+                        Browse Exercises
+                      </Button>
+                    }
+                  />
+                  <Button onClick={addExercise} variant="ghost" className="flex items-center gap-2">
+                    <Plus className="w-5 h-5" />
+                    Add Blank Exercise
+                  </Button>
+                </div>
+              </div>
             </CardContent>
           </Card>
+
+          {/* Rest Timer */}
+          <RestTimer />
         </div>
       </main>
     </div>

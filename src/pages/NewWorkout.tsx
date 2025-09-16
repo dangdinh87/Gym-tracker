@@ -1,17 +1,21 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useWorkouts } from "@/hooks/useWorkouts";
-import { Workout, Exercise, Set } from "@/types/workout";
+import { Workout, Exercise, Set, WorkoutTemplate } from "@/types/workout";
 import { PageHeader, PageHeaderHeading } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Save, ArrowLeft, Trash2 } from "lucide-react";
+import { Plus, Save, ArrowLeft, Trash2, Copy, Search } from "lucide-react";
 import { Navbar } from "@/components/layout/navbar";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { ExerciseSearch } from "@/components/workout/ExerciseSearch";
+import { WorkoutTemplates } from "@/components/workout/WorkoutTemplates";
+import { RestTimer } from "@/components/workout/RestTimer";
+import { ExerciseLibraryItem } from "@/data/exerciseLibrary";
 
 const NewWorkout = () => {
   const navigate = useNavigate();
@@ -39,6 +43,65 @@ const NewWorkout = () => {
       ...prev,
       exercises: [...(prev.exercises || []), newExercise]
     }));
+  };
+
+  const addExerciseFromLibrary = (libraryExercise: ExerciseLibraryItem) => {
+    const newExercise: Exercise = {
+      id: Date.now().toString(),
+      name: libraryExercise.name,
+      muscleGroups: libraryExercise.muscleGroups,
+      sets: [createNewSet()],
+      notes: libraryExercise.instructions || "",
+    };
+    
+    setWorkout(prev => ({
+      ...prev,
+      exercises: [...(prev.exercises || []), newExercise]
+    }));
+  };
+
+  const loadTemplate = (template: WorkoutTemplate) => {
+    const templateWorkout: Partial<Workout> = {
+      name: template.name,
+      date: new Date().toISOString().split('T')[0],
+      exercises: template.exercises.map(templateExercise => ({
+        ...templateExercise,
+        sets: [createNewSet()]
+      })),
+      notes: "",
+      completed: false,
+    };
+    
+    setWorkout(templateWorkout);
+    
+    toast({
+      title: "Template loaded",
+      description: `${template.name} template has been loaded successfully.`,
+    });
+  };
+
+  const duplicateWorkout = (existingWorkout: Workout) => {
+    const duplicatedWorkout: Partial<Workout> = {
+      name: `${existingWorkout.name} (Copy)`,
+      date: new Date().toISOString().split('T')[0],
+      exercises: existingWorkout.exercises.map(exercise => ({
+        ...exercise,
+        id: Date.now().toString() + Math.random(),
+        sets: exercise.sets.map(set => ({
+          ...set,
+          id: Date.now().toString() + Math.random()
+        }))
+      })),
+      notes: existingWorkout.notes,
+      completed: false,
+    };
+    
+    setWorkout(duplicatedWorkout);
+    
+    toast({
+      title: "Workout duplicated",
+      description: "Previous workout has been copied successfully.",
+    });
   };
 
   const createNewSet = (): Set => ({
@@ -172,15 +235,51 @@ const NewWorkout = () => {
             </CardContent>
           </Card>
 
+          {/* Quick Actions */}
+          <Card className="bg-gradient-card border-border shadow-card">
+            <CardHeader>
+              <CardTitle>Quick Start</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <WorkoutTemplates 
+                  onSelect={loadTemplate}
+                  trigger={
+                    <Button variant="outline" className="w-full">
+                      <Copy className="w-4 h-4 mr-2" />
+                      Use Template
+                    </Button>
+                  }
+                />
+                <ExerciseSearch 
+                  onSelect={addExerciseFromLibrary}
+                  trigger={
+                    <Button variant="outline" className="w-full">
+                      <Search className="w-4 h-4 mr-2" />
+                      Browse Exercises
+                    </Button>
+                  }
+                />
+                <Button onClick={addExercise} variant="outline" className="w-full">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Blank Exercise
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Exercises */}
           <Card className="bg-gradient-card border-border shadow-card">
             <CardHeader>
               <div className="flex justify-between items-center">
                 <CardTitle>Exercises</CardTitle>
-                <Button onClick={addExercise} size="sm" className="bg-gradient-primary">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Exercise
-                </Button>
+                <div className="flex gap-2">
+                  <ExerciseSearch onSelect={addExerciseFromLibrary} />
+                  <Button onClick={addExercise} size="sm" className="bg-gradient-primary">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Exercise
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardContent>
@@ -267,6 +366,11 @@ const NewWorkout = () => {
               )}
             </CardContent>
           </Card>
+
+          {/* Rest Timer */}
+          {workout.exercises && workout.exercises.length > 0 && (
+            <RestTimer />
+          )}
 
           {/* Save Button */}
           <div className="flex justify-end space-x-4">
