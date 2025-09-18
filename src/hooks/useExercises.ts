@@ -40,8 +40,8 @@ export const useExercises = () => {
         if (error) throw error;
 
         setExercises((data as unknown as SupabaseExercise[]) || []);
-      } catch (error) {
-        console.error('Error loading exercises:', error);
+        console.log('Loaded exercises from Supabase:', data?.length || 0);
+        } catch (error) {
         toast({
           title: "Error loading exercises",
           description: "Failed to load exercises from database",

@@ -31,6 +31,7 @@ export function ExerciseLibrary({ onSelectExercise, showAddButton = false }: Exe
     categories,
     equipmentTypes,
     levels,
+    allExercises,
   } = useExercises();
 
   const [selectedExercise, setSelectedExercise] = useState<SupabaseExercise | null>(null);
@@ -64,19 +65,15 @@ export function ExerciseLibrary({ onSelectExercise, showAddButton = false }: Exe
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-10" />
-          ))}
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array.from({ length: 9 }).map((_, i) => (
-            <Skeleton key={i} className="h-48" />
-          ))}
+        <div className="text-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading exercises...</p>
         </div>
       </div>
     );
   }
+
+  console.log('Exercises loaded:', exercises.length, 'Total in DB:', allExercises.length);
 
   return (
     <div className="space-y-6">
@@ -378,13 +375,16 @@ export function ExerciseLibrary({ onSelectExercise, showAddButton = false }: Exe
         ))}
       </div>
       
-      {exercises.length === 0 && (
+      {exercises.length === 0 && !isLoading && (
         <Card className="bg-gradient-card border-border">
           <CardContent className="py-12 text-center">
             <Dumbbell className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
             <h3 className="text-lg font-semibold mb-2">No exercises found</h3>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground mb-2">
               Try adjusting your search terms or filters to find exercises.
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Total exercises in database: {allExercises.length}
             </p>
           </CardContent>
         </Card>
