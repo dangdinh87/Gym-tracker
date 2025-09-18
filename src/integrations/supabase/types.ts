@@ -16,35 +16,57 @@ export type Database = {
     Tables: {
       exercises: {
         Row: {
-          created_at: string | null
+          aliases: string[] | null
+          category: Database["public"]["Enums"]["categorytype"]
+          date_created: string
+          date_updated: string
+          description: string | null
+          equipment: Database["public"]["Enums"]["equipmenttype"] | null
+          force: Database["public"]["Enums"]["forcetype"] | null
           id: string
+          instructions: string[] | null
+          level: Database["public"]["Enums"]["leveltype"]
+          mechanic: Database["public"]["Enums"]["mechanictype"] | null
           name: string
-          sets: Json
-          workout_id: string
+          primary_muscles: Database["public"]["Enums"]["muscle"][] | null
+          secondary_muscles: Database["public"]["Enums"]["muscle"][] | null
+          tips: string[] | null
         }
         Insert: {
-          created_at?: string | null
-          id?: string
+          aliases?: string[] | null
+          category: Database["public"]["Enums"]["categorytype"]
+          date_created?: string
+          date_updated?: string
+          description?: string | null
+          equipment?: Database["public"]["Enums"]["equipmenttype"] | null
+          force?: Database["public"]["Enums"]["forcetype"] | null
+          id: string
+          instructions?: string[] | null
+          level: Database["public"]["Enums"]["leveltype"]
+          mechanic?: Database["public"]["Enums"]["mechanictype"] | null
           name: string
-          sets?: Json
-          workout_id: string
+          primary_muscles?: Database["public"]["Enums"]["muscle"][] | null
+          secondary_muscles?: Database["public"]["Enums"]["muscle"][] | null
+          tips?: string[] | null
         }
         Update: {
-          created_at?: string | null
+          aliases?: string[] | null
+          category?: Database["public"]["Enums"]["categorytype"]
+          date_created?: string
+          date_updated?: string
+          description?: string | null
+          equipment?: Database["public"]["Enums"]["equipmenttype"] | null
+          force?: Database["public"]["Enums"]["forcetype"] | null
           id?: string
+          instructions?: string[] | null
+          level?: Database["public"]["Enums"]["leveltype"]
+          mechanic?: Database["public"]["Enums"]["mechanictype"] | null
           name?: string
-          sets?: Json
-          workout_id?: string
+          primary_muscles?: Database["public"]["Enums"]["muscle"][] | null
+          secondary_muscles?: Database["public"]["Enums"]["muscle"][] | null
+          tips?: string[] | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "exercises_workout_id_fkey"
-            columns: ["workout_id"]
-            isOneToOne: false
-            referencedRelation: "workouts"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       nutrition_entries: {
         Row: {
@@ -142,6 +164,57 @@ export type Database = {
         }
         Relationships: []
       }
+      workout_exercises: {
+        Row: {
+          created_at: string
+          exercise_id: string | null
+          id: string
+          name: string
+          notes: string | null
+          order_index: number
+          sets: Json
+          updated_at: string
+          workout_id: string
+        }
+        Insert: {
+          created_at?: string
+          exercise_id?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          order_index?: number
+          sets?: Json
+          updated_at?: string
+          workout_id: string
+        }
+        Update: {
+          created_at?: string
+          exercise_id?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          order_index?: number
+          sets?: Json
+          updated_at?: string
+          workout_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workout_exercises_exercise_id_fkey"
+            columns: ["exercise_id"]
+            isOneToOne: false
+            referencedRelation: "exercises"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workout_exercises_workout_id_fkey"
+            columns: ["workout_id"]
+            isOneToOne: false
+            referencedRelation: "workouts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       workouts: {
         Row: {
           created_at: string | null
@@ -183,7 +256,48 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      categorytype:
+        | "strength"
+        | "stretching"
+        | "plyometrics"
+        | "strongman"
+        | "powerlifting"
+        | "cardio"
+        | "olympic weightlifting"
+      equipmenttype:
+        | "body only"
+        | "machine"
+        | "other"
+        | "foam roll"
+        | "kettlebells"
+        | "dumbbell"
+        | "cable"
+        | "barbell"
+        | "bands"
+        | "medicine ball"
+        | "exercise ball"
+        | "e-z curl bar"
+      forcetype: "pull" | "push" | "static"
+      leveltype: "beginner" | "intermediate" | "expert"
+      mechanictype: "compound" | "isolation"
+      muscle:
+        | "abdominals"
+        | "hamstrings"
+        | "adductors"
+        | "quadriceps"
+        | "biceps"
+        | "shoulders"
+        | "chest"
+        | "middle back"
+        | "calves"
+        | "glutes"
+        | "lower back"
+        | "lats"
+        | "triceps"
+        | "traps"
+        | "forearms"
+        | "neck"
+        | "abductors"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -310,6 +424,52 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      categorytype: [
+        "strength",
+        "stretching",
+        "plyometrics",
+        "strongman",
+        "powerlifting",
+        "cardio",
+        "olympic weightlifting",
+      ],
+      equipmenttype: [
+        "body only",
+        "machine",
+        "other",
+        "foam roll",
+        "kettlebells",
+        "dumbbell",
+        "cable",
+        "barbell",
+        "bands",
+        "medicine ball",
+        "exercise ball",
+        "e-z curl bar",
+      ],
+      forcetype: ["pull", "push", "static"],
+      leveltype: ["beginner", "intermediate", "expert"],
+      mechanictype: ["compound", "isolation"],
+      muscle: [
+        "abdominals",
+        "hamstrings",
+        "adductors",
+        "quadriceps",
+        "biceps",
+        "shoulders",
+        "chest",
+        "middle back",
+        "calves",
+        "glutes",
+        "lower back",
+        "lats",
+        "triceps",
+        "traps",
+        "forearms",
+        "neck",
+        "abductors",
+      ],
+    },
   },
 } as const

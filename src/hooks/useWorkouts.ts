@@ -23,7 +23,7 @@ export const useWorkouts = () => {
           .from('workouts')
           .select(`
             *,
-            exercises (*)
+            workout_exercises (*)
           `)
           .order('date', { ascending: false });
 
@@ -34,11 +34,12 @@ export const useWorkouts = () => {
           name: workout.name,
           date: workout.date,
           duration: workout.duration || 0,
-          exercises: workout.exercises?.map((exercise: any) => ({
+          exercises: workout.workout_exercises?.map((exercise: any) => ({
             id: exercise.id,
             name: exercise.name,
             muscleGroups: [],
-            sets: exercise.sets || []
+            sets: typeof exercise.sets === 'string' ? JSON.parse(exercise.sets) : exercise.sets || [],
+            notes: exercise.notes || ''
           })) || [],
           notes: workout.notes || '',
           completed: false
@@ -87,14 +88,16 @@ export const useWorkouts = () => {
 
       // Add exercises
       if (workout.exercises.length > 0) {
-        const exercisesData = workout.exercises.map(exercise => ({
+        const exercisesData = workout.exercises.map((exercise, index) => ({
           workout_id: workoutData.id,
           name: exercise.name,
-          sets: JSON.stringify(exercise.sets)
+          sets: JSON.stringify(exercise.sets),
+          notes: exercise.notes || '',
+          order_index: index
         }));
 
         const { data: exercisesInserted, error: exercisesError } = await supabase
-          .from('exercises')
+          .from('workout_exercises')
           .insert(exercisesData)
           .select();
 
@@ -109,7 +112,8 @@ export const useWorkouts = () => {
             id: exercise.id,
             name: exercise.name,
             muscleGroups: [],
-            sets: typeof exercise.sets === 'string' ? JSON.parse(exercise.sets) : exercise.sets || []
+            sets: typeof exercise.sets === 'string' ? JSON.parse(exercise.sets) : exercise.sets || [],
+            notes: exercise.notes || ''
           })) || [],
           notes: workoutData.notes || '',
           completed: false
@@ -163,17 +167,19 @@ export const useWorkouts = () => {
       // Update exercises if provided
       if (updates.exercises) {
         // Delete existing exercises
-        await supabase.from('exercises').delete().eq('workout_id', id);
+        await supabase.from('workout_exercises').delete().eq('workout_id', id);
 
         // Insert new exercises
         if (updates.exercises.length > 0) {
-          const exercisesData = updates.exercises.map(exercise => ({
+          const exercisesData = updates.exercises.map((exercise, index) => ({
             workout_id: id,
             name: exercise.name,
-            sets: JSON.stringify(exercise.sets)
+            sets: JSON.stringify(exercise.sets),
+            notes: exercise.notes || '',
+            order_index: index
           }));
 
-          await supabase.from('exercises').insert(exercisesData);
+          await supabase.from('workout_exercises').insert(exercisesData);
         }
       }
 
