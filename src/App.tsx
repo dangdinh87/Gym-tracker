@@ -11,6 +11,7 @@ import WorkoutDetail from "./pages/WorkoutDetail";
 import Calendar from "./pages/Calendar";
 import Progress from "./pages/Progress";
 import Nutrition from "./pages/Nutrition";
+import Exercises from "./pages/Exercises";
 import Settings from "./pages/Settings";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
@@ -52,6 +53,7 @@ const App = () => {
                   <Route path="/calendar" element={<Calendar />} />
                   <Route path="/progress" element={<Progress />} />
                   <Route path="/nutrition" element={<Nutrition />} />
+                  <Route path="/exercises" element={<Exercises />} />
                   <Route path="/settings" element={<Settings />} />
                 </>
               ) : (

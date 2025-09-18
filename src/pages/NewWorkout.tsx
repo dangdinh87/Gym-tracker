@@ -15,7 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ExerciseSearch } from "@/components/workout/ExerciseSearch";
 import { WorkoutTemplates } from "@/components/workout/WorkoutTemplates";
 import { RestTimer } from "@/components/workout/RestTimer";
-import { ExerciseLibraryItem } from "@/data/exerciseLibrary";
+import { SupabaseExercise } from "@/hooks/useExercises";
 
 const NewWorkout = () => {
   const navigate = useNavigate();
@@ -45,13 +45,13 @@ const NewWorkout = () => {
     }));
   };
 
-  const addExerciseFromLibrary = (libraryExercise: ExerciseLibraryItem) => {
+  const addExerciseFromLibrary = (libraryExercise: SupabaseExercise) => {
     const newExercise: Exercise = {
       id: Date.now().toString(),
       name: libraryExercise.name,
-      muscleGroups: libraryExercise.muscleGroups,
+      muscleGroups: [...libraryExercise.primary_muscles, ...libraryExercise.secondary_muscles],
       sets: [createNewSet()],
-      notes: libraryExercise.instructions || "",
+      notes: libraryExercise.instructions?.join(' ') || libraryExercise.description || "",
     };
     
     setWorkout(prev => ({

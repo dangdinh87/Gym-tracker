@@ -15,7 +15,7 @@ import { RestTimer } from "@/components/workout/RestTimer";
 import { useState } from "react";
 import { format } from "date-fns";
 import { toast } from "@/components/ui/use-toast";
-import { ExerciseLibraryItem } from "@/data/exerciseLibrary";
+import { SupabaseExercise } from "@/hooks/useExercises";
 
 const WorkoutDetail = () => {
   const { id } = useParams();
@@ -82,13 +82,13 @@ const WorkoutDetail = () => {
     });
   };
 
-  const addExerciseFromLibrary = (libraryExercise: ExerciseLibraryItem) => {
+  const addExerciseFromLibrary = (libraryExercise: SupabaseExercise) => {
     const newExercise: Exercise = {
       id: Date.now().toString(),
       name: libraryExercise.name,
-      muscleGroups: libraryExercise.muscleGroups,
+      muscleGroups: [...libraryExercise.primary_muscles, ...libraryExercise.secondary_muscles],
       sets: [],
-      notes: libraryExercise.instructions || "",
+      notes: libraryExercise.instructions?.join(' ') || libraryExercise.description || "",
     };
     
     updateWorkout(workout.id, {
