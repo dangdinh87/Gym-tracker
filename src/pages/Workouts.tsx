@@ -9,11 +9,34 @@ import { Navbar } from "@/components/layout/navbar";
 import { format } from "date-fns";
 
 const Workouts = () => {
-  const { workouts, deleteWorkout } = useWorkouts();
+  const { workouts, deleteWorkout, isLoading } = useWorkouts();
   
   const sortedWorkouts = workouts.sort((a, b) => 
     new Date(b.date).getTime() - new Date(a.date).getTime()
   );
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <PageHeader>
+            <div className="flex justify-between items-start">
+              <div>
+                <PageHeaderHeading>Workouts</PageHeaderHeading>
+                <PageHeaderDescription>
+                  Manage your workout sessions and track your progress
+                </PageHeaderDescription>
+              </div>
+            </div>
+          </PageHeader>
+          <div className="flex items-center justify-center py-16">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
