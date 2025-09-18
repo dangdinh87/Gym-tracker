@@ -21,6 +21,18 @@ export interface FoodEntry {
   meal: 'breakfast' | 'lunch' | 'dinner' | 'snack';
 }
 
+// Legacy interface for backward compatibility
+export interface SimpleFoodEntry {
+  id: string;
+  name: string;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  quantity?: number;
+  date: string;
+}
+
 export interface DailyNutrition {
   date: string;
   entries: FoodEntry[];

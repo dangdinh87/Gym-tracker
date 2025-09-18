@@ -6,9 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Bell, Download, Upload, Trash2, Sun, Moon, Settings as SettingsIcon, FileText } from "lucide-react";
+import { Bell, Download, Upload, Trash2, Sun, Moon, Settings as SettingsIcon, FileText, LogOut, User } from "lucide-react";
 import { useExportImport } from "@/hooks/useExportImport";
 import { useWorkouts } from "@/hooks/useWorkouts";
+import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 
 const Settings = () => {
@@ -20,7 +21,24 @@ const Settings = () => {
   const { theme, setTheme } = useTheme();
   const { exportWorkouts, exportToCSV, importWorkouts } = useExportImport();
   const { workouts } = useWorkouts();
+  const { user, signOut } = useAuth();
   const { toast } = useToast();
+
+  const handleSignOut = async () => {
+    const { error } = await signOut();
+    if (error) {
+      toast({
+        title: "Error signing out",
+        description: error.message,
+        variant: "destructive"
+      });
+    } else {
+      toast({
+        title: "Signed out successfully",
+        description: "You have been signed out of your account"
+      });
+    }
+  };
 
   const toggleTheme = () => {
     setTheme(theme === "dark" ? "light" : "dark");
@@ -66,6 +84,39 @@ const Settings = () => {
         </PageHeader>
 
         <div className="space-y-6">
+          {/* Account */}
+          <Card className="bg-gradient-card border-border shadow-card">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <User className="w-5 h-5" />
+                Account
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label>Email</Label>
+                  <p className="text-sm text-muted-foreground">
+                    {user?.email}
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <div>
+                  <Label>Sign Out</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Sign out of your account
+                  </p>
+                </div>
+                <Button variant="outline" onClick={handleSignOut}>
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sign Out
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Preferences */}
           <Card className="bg-gradient-card border-border shadow-card">
             <CardHeader>
