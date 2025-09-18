@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { useTheme } from "next-themes";
 import { Navbar } from "@/components/layout/navbar";
 import { PageHeader, PageHeaderHeading, PageHeaderDescription } from "@/components/ui/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,13 +14,17 @@ import { useToast } from "@/hooks/use-toast";
 const Settings = () => {
   const [weightUnit, setWeightUnit] = useState("kg");
   const [notifications, setNotifications] = useState(true);
-  const [darkMode, setDarkMode] = useState(true);
   const [restTimerSound, setRestTimerSound] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
+  const { theme, setTheme } = useTheme();
   const { exportWorkouts, exportToCSV, importWorkouts } = useExportImport();
   const { workouts } = useWorkouts();
   const { toast } = useToast();
+
+  const toggleTheme = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
+  };
 
   const handleImport = () => {
     fileInputRef.current?.click();
@@ -93,8 +98,8 @@ const Settings = () => {
                 <div className="flex items-center space-x-2">
                   <Sun className="w-4 h-4" />
                   <Switch
-                    checked={darkMode}
-                    onCheckedChange={setDarkMode}
+                    checked={theme === "dark"}
+                    onCheckedChange={toggleTheme}
                   />
                   <Moon className="w-4 h-4" />
                 </div>
