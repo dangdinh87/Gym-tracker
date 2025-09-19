@@ -75,6 +75,7 @@ export default {
       boxShadow: {
         'glow': 'var(--shadow-glow)',
         'card': 'var(--shadow-card)',
+        'card-hover': 'var(--shadow-card-hover)',
       },
       keyframes: {
         "accordion-down": {
